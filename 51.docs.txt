@@ -1,0 +1,82 @@
+﻿Assignment 5.1
+
+
+
+
+
+import org.apache.hadoop.fs.Path; 
+import org.apache.hadoop.conf.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat; 
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat; 
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat; 
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+
+public class Task51 {
+	@SuppressWarnings("deprecation")
+	public static void main(String[] args) throws Exception {
+		Configuration conf = new Configuration();
+		Job job = new Job(conf, "DemoTask1");
+		job.setJarByClass(Task51.class);
+
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(Text.class);
+
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(Text.class);
+		job.setMapperClass(Task51Mapper.class);
+		job.setNumReduceTasks(0);// made the number of reducer tasks as 0 as only mapping is needed
+		//job.setReducerClass(Task1Reducer.class);
+		 
+		job.setInputFormatClass(TextInputFormat.class);
+		job.setOutputFormatClass(TextOutputFormat.class);
+
+		FileInputFormat.addInputPath(job, new Path(args[0])); 
+		FileOutputFormat.setOutputPath(job,new Path(args[1]));
+		
+		/*
+		Path out=new Path(args[1]);
+		out.getFileSystem(conf).delete(out);
+		*/
+		
+		job.waitForCompletion(true);// wait for the job to end
+	}
+}
+
+
+
+// mapper class
+
+
+
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.*; 
+
+public class Task51Mapper extends Mapper<LongWritable, Text, Text, Text> {
+	public void map(LongWritable key, Text value, Context context) 
+			throws IOException, InterruptedException {
+		String[] lineArray = value.toString().split("\\|");
+		String s = lineArray[0];//stroing the splitted values in strings
+		String s1 = lineArray[1];
+		if(!(s.equals("NA") || s1.equals("NA")))//NA condition implemented
+		{
+		context.write(new Text(value), new Text());
+		}
+	}
+}
+
+
+//output png 
+
+
+
+
+NOTE – Data set file also attached all the “NA” related entries removed.
+File saved in ODF format
